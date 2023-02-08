@@ -1,37 +1,76 @@
-<?php
-/**
- * ajax_headline.php along with ajax_headline1.htm or ajax_headline2.htm to demonstrate simple event based AJAX 
- * 
- * @package WEB150
- * @author Bill Newman <williamnewman@gmail.com>
- * @version 1.0 2009/10/06
- * @link http://www.billnsara.com/js/ 
- * @license http://opensource.org/licenses/osl-3.0.php Open Software License ("OSL") v. 3.0
- * @see ajax_headline1.htm
- * @see ajax_headline2.htm 
- * @todo none
- */
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+     <title>Form Template</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/main-form.css">
+   <script type="text/javascript">
+var xmlHttp;
+//assign 'doStart()' AJAX function to begin when page first loads - same as onload attribute of body tag
+//note the absence of parens, as we don't want the function to fire off, just be referenced by the onload event
+window.onload = doStart; 
+function createXMLHttpRequest() {
+    if (window.ActiveXObject) {
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+    } 
+    else if (window.XMLHttpRequest) {
+        xmlHttp = new XMLHttpRequest();
+    }
+}
+    
+function doStart() {
+    createXMLHttpRequest();
+    myObj = document.getElementById("newsFlash");  //grab div via DOM
+    myObj.innerHTML = '<div align="center"><img src="images/loading.gif" /></div>';  //write 'loading' gif to div
+    url = "ajax_headline.php?h=yes" + "&ts=" + new Date().getTime();
+    xmlHttp.open("GET",url, true);
+    xmlHttp.onreadystatechange = pollServer;
+    xmlHttp.send(null);
+}
+    
+function pollServer() {
+    if(xmlHttp.readyState == 4) {
+        if(xmlHttp.status == 200) {
+            myObj = document.getElementById("newsFlash");
+            ajaxNews = '<div style="border:1 red dashed;" align="center"><b>News FLASH: (';
+            ajaxNews += new Date().toLocaleString() + ')<font color="blue" size="+2"><br />'; 
+            ajaxNews += xmlHttp.responseText;
+            ajaxNews += '</font></b></div>';
+            myObj.innerHTML = ajaxNews;  //overwrite current contents of div with new formatted headline
+            setTimeout("doStart()", 10000);  //set AJAX function to run again in 10 seconds 
+        }
+    }
+}
+</script>
+ </head>
+ <body>
+     <header>
+     <h1 class="page-header">AJAX Quotes</h1>
+        <nav class="topnav" id="myTopnav">
+            <a href="index.html" class="active">Home</a>
+            <a href="#">Link</a>
+            <a href="#">Link</a>
+            <a href="javascript:void(0);" class="icon" onclick="myFunction()">&#9776;</a>
+        </nav>
+     </header>
+     
+   <main class="wrapper">
 
-//if letter "h" is sent via GET, print a random headline 
-if(isset($_GET["h"])){$myTest = $_GET["h"];}else{$myTest = "";}
+     <p>This page uses AJAX to display a new quote every 10 seconds. It basically does this by every 10 seconds calling the AJAX engine to make a request to the server, then the server sends XML data to the AJAX engine, and the AJAX engine sends the HTML and CSS back to the browser.</p>
+ 
+  <span id="newsFlash" align="right">&nbsp;</span>  
 
-if($myTest == "yes")
-{//get headline!
-	$aHeadline = array();
-    $aHeadline[0] = "House, always wins.";
-    $aHeadline[1] = "Oke.";
-    $aHeadline[2] = "Why, because I can.";
-    $aHeadline[3] = "CHAAAAARGE!";
-    $aHeadline[4] = "Character is revealed by when one retreats.";
-    $aHeadline[5] = "Others try—I succeed.";
-    $aHeadline[6] = "Burdens of the past.";
-    $aHeadline[7] = "Learn from your mistakes.";
-    $aHeadline[8] = "No more hesitation.";
-    $aHeadline[9] = "No looking back.";
-	srand(time());
-	$random = (rand()%9);
-	print $aHeadline[$random];
-}else{
-	print "This is an AJAX page, and you didn't say the magic word!";	
-}	
-?>
+    <footer>
+      <p><small>&copy; 2021-<span id="this-year"></span> by 
+          Brandon Tran, All Rights Reserved ~ 
+          <a id="html-checker" href="#" target="_blank">Check HTML</a> ~ 
+          <a id="css-checker" href="#" target="_blank">Check CSS</a></small>
+     </p>
+    </footer>
+  </main>
+  <script src="js/main.js"></script>   
+ </body>
+</html>
